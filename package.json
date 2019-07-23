@@ -1,0 +1,36 @@
+{
+  "name": "WeChatMediaPlatformAutomation",
+  "version": "1.0.0",
+  "description": "An automated tool for posting pages on WeChatMediaPlatform(https://mp.weixin.qq.com) using puppeteer.",
+  "main": "automation.js",
+  "scripts": {
+    "debug": "env SHOW_BROWSER=s node automation.js",
+    "start": "node automation.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/LinusLing/WeChatMediaPlatformAutomation.git"
+  },
+  "keywords": [
+    "automation",
+    "wechat",
+    "weixin",
+    "MediaPlatform"
+  ],
+  "author": "Linus Ling",
+  "license": "MIT",
+  "dependencies": {
+    "clipboardy": "^2.1.0",
+    "commander": "^2.20.0",
+    "js-localdate-plus": "^1.0.1",
+    "open": "^6.4.0",
+    "puppeteer": "^1.18.1"
+  },
+  "bugs": {
+    "url": "https://github.com/LinusLing/WeChatMediaPlatformAutomation/issues"
+  },
+  "bin": {
+    "wechatAutoPublish": "./automation.js"
+  }
+}
