@@ -1,5 +1,5 @@
 {
-  "name": "WeChatMediaPlatformAutomation",
+  "name": "wechat-mp-automation",
   "version": "1.0.0",
   "description": "An automated tool for posting pages on WeChatMediaPlatform(https://mp.weixin.qq.com) using puppeteer.",
   "main": "automation.js",
@@ -13,7 +13,7 @@
     "url": "git://github.com/LinusLing/WeChatMediaPlatformAutomation.git"
   },
   "keywords": [
-    "automation",
+    "Automation",
     "wechat",
     "weixin",
     "MediaPlatform"
@@ -31,6 +31,6 @@
     "url": "https://github.com/LinusLing/WeChatMediaPlatformAutomation/issues"
   },
   "bin": {
-    "wechatAutoPublish": "./automation.js"
+    "wechat-mp-automation": "./automation.js"
   }
 }
