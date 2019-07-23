@@ -11,6 +11,7 @@
 3. 过程中的两次扫码：一次扫码验证身份登录，一次扫码确认群发（如未异常报错）
 
 > 本工具不以任何形式保存账号和密码！！！
+> puppeteer 安装失败可以参考[这里](https://github.com/cnpm/cnpmjs.org/issues/1246#issuecomment-359148058)
 
 ## 帮助文档
 
