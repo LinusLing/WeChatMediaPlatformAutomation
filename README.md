@@ -35,11 +35,11 @@ Options:
 
 1.自动发布成功的流程示例
 
-![CorrectResult.png](https://i.loli.net/2019/07/23/5d37080056caa17437.png)
+![CorrectResult.png](https://i.loli.net/2019/07/23/5d371a7398b4141770.png)
 
 2.发布失败流程及失败原因
 
-![error_progress.png](https://i.loli.net/2019/07/23/5d37088053f6481051.png)
+![error_progress.png](https://i.loli.net/2019/07/23/5d371a73c0f5f58172.png)
 
 ![ErrorResult.png](https://i.loli.net/2019/07/23/5d37086e81ff423521.png)
 
