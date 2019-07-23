@@ -8,7 +8,7 @@ var fs = require('fs');
 const program = require('commander');
 
 program
-    .version('1.0.0')
+    .version('1.0.1')
     .usage(' [options]')
     .option('-t, --title [xxx]', '文章标题')
     .option('-a, --author [xxx]', '文章作者')
