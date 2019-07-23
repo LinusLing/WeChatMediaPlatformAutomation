@@ -4,10 +4,10 @@
 
 ## 如何使用
 
-1. 安装：`npm install WeChatMediaPlatformAutomation -g `
+1. 安装：`npm install wechat-mp-automation -g `
 2. 打开命令行执行：
-   1. 非原创：`wechatAutoPublish -t [标题] -a [作者] -u [账号] -p [密码]`
-   2. 声明原创：`wechatAutoPublish -t [标题] -a [作者] -u [账号] -p [密码] -o`
+   1. 非原创：`wechat-mp-automation -t [标题] -a [作者] -u [账号] -p [密码]`
+   2. 声明原创：`wechat-mp-automation -t [标题] -a [作者] -u [账号] -p [密码] -o`
 3. 过程中的两次扫码：一次扫码验证身份登录，一次扫码确认群发（如未异常报错）
 
 > 本工具不以任何形式保存账号和密码！！！
@@ -15,8 +15,8 @@
 ## 帮助文档
 
 ```git
-$ wechatAutoPublish -h
-Usage: wechatAutoPublish [options]
+$ wechat-mp-automation -h
+Usage: wechat-mp-automation [options]
 
 Options:
   -V, --version         output the version number
