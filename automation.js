@@ -267,7 +267,7 @@ function autoLogin() {
 
             // 等待确认二维码
             await page.waitForSelector('body > div.dialog_wrp.ui-draggable > div > div.dialog_bd > div > div > div.qrcode_wrp > img')
-
+            await page.waitFor(500);
             await page.screenshot({
                 path: 'confirmSend.png',
                 clip: {
