@@ -139,7 +139,7 @@ function autoLogin() {
             console.log("扫码登录中...");
             const IMAGE_SELECTOR = '#app > div.weui-desktop-layout__main__bd > div > div.js_scan.weui-desktop-qrcheck > div.weui-desktop-qrcheck__qrcode-area > div > img'
             await page.waitForSelector(IMAGE_SELECTOR);
-            await page.waitFor(200);
+            await page.waitFor(500);
             await page.screenshot({
                 path: 'screenshot.png',
                 clip: {
@@ -241,6 +241,10 @@ function autoLogin() {
             await page.keyboard.type(String(pasted_content));
             await page.waitFor(100);
 
+            console.log("----------文章内容 begin----------");
+            console.log(pasted_content)
+            console.log("----------文章内容 end----------");
+
             // 封面图片选择
             console.log("正在自动选择封面图片...");
             await page.hover('#js_cover_area > div.select-cover__btn.js_cover_btn_area');
@@ -259,6 +263,7 @@ function autoLogin() {
             // 选择图片完成
             const IMG_DONE = "body > div.dialog_wrp.img_dialog_wrp.ui-draggable > div > div.dialog_ft > span.js_crop_done_btn.btn.btn_primary.btn_input.js_btn_p > button";
             await page.waitForSelector(IMG_DONE);
+            await page.waitFor(200);
             await page.click(IMG_DONE);
             await page.waitFor(1000);
 
