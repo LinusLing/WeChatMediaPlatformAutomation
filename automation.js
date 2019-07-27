@@ -8,8 +8,9 @@ var fs = require('fs');
 const program = require('commander');
 
 program
-    .version('1.0.2')
+    .version('1.1.0')
     .usage(' [options]')
+    .option('-C, --configPath [xxx]', '配置文件的本地路径（支持所有自定义参数）')
     .option('-t, --title [xxx]', '文章标题')
     .option('-a, --author [xxx]', '文章作者')
     .option('-c, --content [xxx]', '文章内容[可选]，默认从粘贴板复制')
@@ -19,42 +20,73 @@ program
     .parse(process.argv);
 
 let title;
-if (program.title === undefined) {
-    console.log('缺少文章标题， -h 了解如何使用');
-    return;
-} else {
-    title = String(program.title);
-    console.log('文章标题：' + title);
-}
 let author;
-if (program.author === undefined) {
-    console.log('缺少文章作者， -h 了解如何使用');
-    return;
-} else {
-    author = String(program.author);
-    console.log('文章作者：' + author);
-}
 let content;
-if (program.content === undefined) {} else {
-    content = String(program.content);
-}
 let username;
-if (program.username === undefined) {
-    console.log('缺少公众号账号， -h 了解如何使用');
-    return;
-} else {
-    username = String(program.username);
-}
 let password;
-if (program.password === undefined) {
-    console.log('缺少公众号密码， -h 了解如何使用');
-    return;
-} else {
-    password = String(program.password);
-}
 let original;
-if (program.original === undefined) {} else {
-    original = program.original;
+
+if (program.configPath !== undefined) {
+    try {
+        const contents = fs.readFileSync(program.configPath);
+        const jsonContent = JSON.parse(contents);
+        title = jsonContent.title || undefined;
+        author = jsonContent.author || undefined;
+        content = jsonContent.content || undefined;
+        username = jsonContent.username || undefined;
+        password = jsonContent.password || undefined;
+        original = jsonContent.original || undefined;
+        console.log('读取配置文件成功');
+    } catch (error) {
+        console.log('读取配置文件失败');
+        console.log(error);
+    }
+}
+
+if (title === undefined) {
+    if (program.title === undefined) {
+        console.log('缺少文章标题， -h 了解如何使用');
+        return;
+    } else {
+        title = String(program.title);
+        console.log('文章标题：' + title);
+    }
+}
+
+if (author === undefined) {
+    if (program.author === undefined) {
+        console.log('缺少文章作者， -h 了解如何使用');
+        return;
+    } else {
+        author = String(program.author);
+        console.log('文章作者：' + author);
+    }
+}
+if (content === undefined) {
+    if (program.content === undefined) {} else {
+        content = String(program.content);
+    }
+}
+if (username === undefined) {
+    if (program.username === undefined) {
+        console.log('缺少公众号账号， -h 了解如何使用');
+        return;
+    } else {
+        username = String(program.username);
+    }
+}
+if (password === undefined) {
+    if (program.password === undefined) {
+        console.log('缺少公众号密码， -h 了解如何使用');
+        return;
+    } else {
+        password = String(program.password);
+    }
+}
+if (original === undefined) {
+    if (program.original === undefined) {} else {
+        original = program.original;
+    }
 }
 console.log((!original ? "文章不" : "文章将") + "声明原创");
 
@@ -107,7 +139,7 @@ function autoLogin() {
             console.log("扫码登录中...");
             const IMAGE_SELECTOR = '#app > div.weui-desktop-layout__main__bd > div > div.js_scan.weui-desktop-qrcheck > div.weui-desktop-qrcheck__qrcode-area > div > img'
             await page.waitForSelector(IMAGE_SELECTOR);
-            await page.waitFor(200);
+            await page.waitFor(500);
             await page.screenshot({
                 path: 'screenshot.png',
                 clip: {
@@ -209,6 +241,10 @@ function autoLogin() {
             await page.keyboard.type(String(pasted_content));
             await page.waitFor(100);
 
+            console.log("----------文章内容 begin----------");
+            console.log(pasted_content)
+            console.log("----------文章内容 end----------");
+
             // 封面图片选择
             console.log("正在自动选择封面图片...");
             await page.hover('#js_cover_area > div.select-cover__btn.js_cover_btn_area');
@@ -227,6 +263,7 @@ function autoLogin() {
             // 选择图片完成
             const IMG_DONE = "body > div.dialog_wrp.img_dialog_wrp.ui-draggable > div > div.dialog_ft > span.js_crop_done_btn.btn.btn_primary.btn_input.js_btn_p > button";
             await page.waitForSelector(IMG_DONE);
+            await page.waitFor(200);
             await page.click(IMG_DONE);
             await page.waitFor(1000);
 

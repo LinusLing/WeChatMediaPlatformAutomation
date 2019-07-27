@@ -6,8 +6,11 @@
 
 1. 安装：`npm install wechat-mp-automation -g `
 2. 打开命令行执行：
-   1. 非原创：`wechat-mp-automation -t [标题] -a [作者] -u [账号] -p [密码]`
-   2. 声明原创：`wechat-mp-automation -t [标题] -a [作者] -u [账号] -p [密码] -o`
+   1. 配置文件方式：
+      1. `wechat-mp-automation -C YOUR_CONFIG_JSON_FILE_PATH`
+   2. 非配置文件方式：
+      1. 非原创：`wechat-mp-automation -t [标题] -a [作者] -u [账号] -p [密码]`
+      2. 声明原创：`wechat-mp-automation -t [标题] -a [作者] -u [账号] -p [密码] -o`
 3. 过程中的两次扫码：一次扫码验证身份登录，一次扫码确认群发（如未异常报错）
 
 > 本工具不以任何形式保存账号和密码！！！
@@ -22,6 +25,7 @@ Usage: wechat-mp-automation [options]
 
 Options:
   -V, --version         output the version number
+  -C, --configPath [xxx]  配置文件的本地路径（支持所有自定义参数，优先配置文件内的参数）
   -t, --title [xxx]     文章标题
   -a, --author [xxx]    文章作者
   -c, --content [xxx]   文章内容[可选]，默认从粘贴板复制
@@ -30,6 +34,25 @@ Options:
   -o, --original        声明原创[可选]
   -h, --help            output usage information
 ```
+
+config.json demo:
+```json
+{
+  "title": "test",
+  "author": "小铁匠Linus",
+  "username": "YOUR_USERNAME",
+  "password": "YOUR_PASSWORD",
+  "original": "true"
+}
+```
+
+## CHANGELOG
+
+<details>
+<summary>1.1.0</summary>
+</br>
+<p>1. 支持使用 JSON 格式的本地配置文件作为参数，避免命令行泄漏关键信息</p>
+<p>2. 支持在发布过程中展示文章内容</p>
 
 ## Demo
 
@@ -56,4 +79,3 @@ Options:
 
 <div style="float:left;border:solid 1px 000;margin:2px;"><img src="https://i.loli.net/2019/07/23/5d370dca1cf1911283.jpg"  width="300" height="450" ></div>
 <div style="float:left;border:solid 1px 000;margin:2px;"><img src="https://i.loli.net/2019/07/23/5d370dcd23ed242202.jpg" width="300" height="450" ></div>
-
