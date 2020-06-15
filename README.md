@@ -49,6 +49,13 @@ config.json demo:
 ## CHANGELOG
 
 <details>
+<summary>1.1.1</summary>
+</br>
+<p>1. 登录默认选择账号密码登录</p>
+<p>2. 官网页面元素的更正，恢复群发流程</p>
+</details>
+
+<details>
 <summary>1.1.0</summary>
 </br>
 <p>1. 支持使用 JSON 格式的本地配置文件作为参数，避免命令行泄漏关键信息</p>

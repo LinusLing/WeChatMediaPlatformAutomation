@@ -124,16 +124,21 @@ function autoLogin() {
 
             // 登录
             console.log("正在登录...");
-            await page.waitForSelector('#header > div.banner > div > div > form > div.login_btn_panel > a');
+            const element = await page.$('[class="login__type__container login__type__container__scan"]');
+            if (element) {
+                await page.click('#header > div.banner > div > div > div.login__type__container.login__type__container__scan > a')
+            }
+
+            await page.waitForSelector('#header > div.banner > div > div > div.login__type__container.login__type__container__account > form > div.login_btn_panel > a');
             //type the name
-            await page.focus('#header > div.banner > div > div > form > div.login_input_panel > div:nth-child(1) > div > span > input')
+            await page.focus('#header > div.banner > div > div > div.login__type__container.login__type__container__account > form > div.login_input_panel > div:nth-child(1) > div > span > input')
             await page.keyboard.type(username);
             //type the pwd
-            await page.focus('#header > div.banner > div > div > form > div.login_input_panel > div:nth-child(2) > div > span > input')
+            await page.focus('#header > div.banner > div > div > div.login__type__container.login__type__container__account > form > div.login_input_panel > div:nth-child(2) > div > span > input')
             await page.keyboard.type(password);
             await page.waitFor(50);
             //Click on the submit button
-            await page.click('#header > div.banner > div > div > form > div.login_btn_panel > a')
+            await page.click('#header > div.banner > div > div > div.login__type__container.login__type__container__account > form > div.login_btn_panel > a')
 
             // 扫码登录
             console.log("扫码登录中...");
@@ -249,19 +254,23 @@ function autoLogin() {
             console.log("正在自动选择封面图片...");
             await page.hover('#js_cover_area > div.select-cover__btn.js_cover_btn_area');
             await page.click('#js_imagedialog');
+            await page.waitForSelector('#vue_app > div:nth-child(5) > div.weui-desktop-dialog__wrp.weui-desktop-dialog_img-picker.weui-desktop-dialog_img-picker-with-crop > div > div.weui-desktop-dialog__ft');
             await page.waitFor(500);
-
             let day = (new LocalDate()).getDay();
-            let len = (await page.$$('li.img_item')).length;
+            const len = await page.$$eval('.weui-desktop-img-picker__list > li.weui-desktop-img-picker__item > i', links => {
+                return links.length
+            });
+
             let offset = day % len + 1;
-            const left = 'body > div.dialog_wrp.img_dialog_wrp.ui-draggable > div > div.dialog_bd > div > div.img_crop_panel > div.js_select_frame.img_pick_panel.inner_container_box.side_l.cell_layout > div.inner_main > div > div.img_pick_area_inner > div.img_pick > ul > li:nth-child(';
+            const left = '#vue_app > div:nth-child(5) > div.weui-desktop-dialog__wrp.weui-desktop-dialog_img-picker.weui-desktop-dialog_img-picker-with-crop > div > div.weui-desktop-dialog__bd > div > div > div:nth-child(2) > div > div.weui-desktop-media-list-wrp.weui-desktop-img-picker__list__wrp.js_img-picker_wrapper > ul > li:nth-child(';
             const right = ')';
             await page.click(left + String(offset) + right);
 
-            await page.click('body > div.dialog_wrp.img_dialog_wrp.ui-draggable > div > div.dialog_ft > span.js_crop_next_btn.btn.btn_input.js_btn_p.btn_primary > button');
+            await page.click('#vue_app > div:nth-child(5) > div.weui-desktop-dialog__wrp.weui-desktop-dialog_img-picker.weui-desktop-dialog_img-picker-with-crop > div > div.weui-desktop-dialog__ft > button');
             await page.waitFor(1200);
+
             // 选择图片完成
-            const IMG_DONE = "body > div.dialog_wrp.img_dialog_wrp.ui-draggable > div > div.dialog_ft > span.js_crop_done_btn.btn.btn_primary.btn_input.js_btn_p > button";
+            const IMG_DONE = "#vue_app > div:nth-child(5) > div.weui-desktop-dialog__wrp.weui-desktop-dialog_img-picker.weui-desktop-dialog_img-picker-with-crop > div > div.weui-desktop-dialog__ft > button:nth-child(3)";
             await page.waitForSelector(IMG_DONE);
             await page.waitFor(200);
             await page.click(IMG_DONE);
@@ -271,7 +280,7 @@ function autoLogin() {
                 // 声明原创
                 console.log("正在声明原创...");
                 await page.click('#js_original > div.unorigin.js_original_type > div.setting-group__content > a');
-                await page.waitForSelector("#js_copyright_agree");
+                await page.waitForSelector("label[for='js_copyright_agree'");
                 await page.click('body > div.dialog_wrp.simple.align_edge.original_dialog.ui-draggable > div > div.dialog_bd > div.step_panel.step_agreement.js_step_panel > div > div > div > div.tool_area.new-tool_area > label > i');
                 await page.click('body > div.dialog_wrp.simple.align_edge.original_dialog.ui-draggable > div > div.dialog_ft > span:nth-child(1) > button');
                 await page.waitFor(50);
@@ -297,7 +306,7 @@ function autoLogin() {
             const SCAN_SEND_BTN = "#send_btn_main > div > a";
             await page.waitForSelector(SCAN_SEND_BTN);
             await page.click(SCAN_SEND_BTN);
-            const CONFIRM_SEND_BTN = "#wxDialog_1 > div.dialog_ft > a.btn.btn_primary.js_btn";
+            const CONFIRM_SEND_BTN = "#vue_app > div:nth-child(3) > div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__ft > button.weui-desktop-btn.weui-desktop-btn_primary";
             await page.waitForSelector(CONFIRM_SEND_BTN);
             await page.waitFor(500);
             await page.click(CONFIRM_SEND_BTN);
