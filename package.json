@@ -1,6 +1,6 @@
 {
   "name": "wechat-mp-automation",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "An automated tool for posting pages on WeChatMediaPlatform(https://mp.weixin.qq.com) using puppeteer.",
   "main": "automation.js",
   "scripts": {
