@@ -8,7 +8,7 @@ var fs = require('fs');
 const program = require('commander');
 
 program
-    .version('1.1.0')
+    .version('1.1.1')
     .usage(' [options]')
     .option('-C, --configPath [xxx]', '配置文件的本地路径（支持所有自定义参数）')
     .option('-t, --title [xxx]', '文章标题')
