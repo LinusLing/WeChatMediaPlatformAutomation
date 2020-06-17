@@ -16,6 +16,8 @@ program
     .option('-c, --content [xxx]', '文章内容[可选]，默认从粘贴板复制')
     .option('-u, --username [xxx]', '公众号账号')
     .option('-p, --password [xxx]', '公众号密码')
+    .option('--preview', '预览而不发布[可选]')
+    .option('--preview_username [xxx]', '预览名单[可选]')
     .option('-o, --original', '声明原创[可选]')
     .parse(process.argv);
 
@@ -25,6 +27,8 @@ let content;
 let username;
 let password;
 let original;
+let preview;
+let preview_username;
 
 if (program.configPath !== undefined) {
     try {
@@ -89,6 +93,19 @@ if (original === undefined) {
     }
 }
 console.log((!original ? "文章不" : "文章将") + "声明原创");
+if (preview === undefined) {
+    if (program.preview === undefined) {} else {
+        preview = program.preview;
+        console.log("文章不会发布，只预览");
+    }
+}
+
+if (preview_username === undefined) {
+    if (program.preview_username === undefined) {} else {
+        preview_username = program.preview_username.split("~");
+        console.log("可预览本文章的微信号：" + preview_username + "（关注公众号后，才能接收图文消息预览）");
+    }
+}
 
 const url = "https://mp.weixin.qq.com/"
 
@@ -243,8 +260,8 @@ function autoLogin() {
                 delay: 100
             });
             let pasted_content = content ? content : (await clipboardy.read());
-            await page.keyboard.type(String(pasted_content));
-            await page.waitFor(100);
+            // await page.keyboard.type(String(pasted_content));
+            await page.waitFor(5000);
 
             console.log("----------文章内容 begin----------");
             console.log(pasted_content)
@@ -254,23 +271,22 @@ function autoLogin() {
             console.log("正在自动选择封面图片...");
             await page.hover('#js_cover_area > div.select-cover__btn.js_cover_btn_area');
             await page.click('#js_imagedialog');
-            await page.waitForSelector('#vue_app > div:nth-child(5) > div.weui-desktop-dialog__wrp.weui-desktop-dialog_img-picker.weui-desktop-dialog_img-picker-with-crop > div > div.weui-desktop-dialog__ft');
-            await page.waitFor(500);
+            await page.waitForSelector('div.weui-desktop-dialog__wrp.weui-desktop-dialog_img-picker.weui-desktop-dialog_img-picker-with-crop > div > div.weui-desktop-dialog__bd > div > div > div:nth-child(2) > div > div.weui-desktop-media-list-wrp.weui-desktop-img-picker__list__wrp.js_img-picker_wrapper > ul > li:nth-child(1)');
+
             let day = (new LocalDate()).getDay();
             const len = await page.$$eval('.weui-desktop-img-picker__list > li.weui-desktop-img-picker__item > i', links => {
                 return links.length
             });
-
             let offset = day % len + 1;
-            const left = '#vue_app > div:nth-child(5) > div.weui-desktop-dialog__wrp.weui-desktop-dialog_img-picker.weui-desktop-dialog_img-picker-with-crop > div > div.weui-desktop-dialog__bd > div > div > div:nth-child(2) > div > div.weui-desktop-media-list-wrp.weui-desktop-img-picker__list__wrp.js_img-picker_wrapper > ul > li:nth-child(';
+            const left = 'div > div.weui-desktop-media-list-wrp.weui-desktop-img-picker__list__wrp.js_img-picker_wrapper > ul > li:nth-child(';
             const right = ')';
             await page.click(left + String(offset) + right);
 
-            await page.click('#vue_app > div:nth-child(5) > div.weui-desktop-dialog__wrp.weui-desktop-dialog_img-picker.weui-desktop-dialog_img-picker-with-crop > div > div.weui-desktop-dialog__ft > button');
+            await page.click('div.weui-desktop-dialog__wrp.weui-desktop-dialog_img-picker.weui-desktop-dialog_img-picker-with-crop > div > div.weui-desktop-dialog__ft > button');
             await page.waitFor(1200);
 
             // 选择图片完成
-            const IMG_DONE = "#vue_app > div:nth-child(5) > div.weui-desktop-dialog__wrp.weui-desktop-dialog_img-picker.weui-desktop-dialog_img-picker-with-crop > div > div.weui-desktop-dialog__ft > button:nth-child(3)";
+            const IMG_DONE = "div.weui-desktop-dialog__wrp.weui-desktop-dialog_img-picker.weui-desktop-dialog_img-picker-with-crop > div > div.weui-desktop-dialog__ft > button:nth-child(3)";
             await page.waitForSelector(IMG_DONE);
             await page.waitFor(200);
             await page.click(IMG_DONE);
@@ -294,45 +310,74 @@ function autoLogin() {
                 await page.waitFor(500);
             }
 
-            // 保存并转发
-            console.log("正在保存文章并转发...");
-            const SEND_BTN = "#js_send > button";
-            await page.waitForSelector(SEND_BTN);
-            await page.click(SEND_BTN);
-            await page.waitFor(500);
+            if (preview === true) {
+                // 预览
+                console.log("正在预览文章...");
+                const PREVIEW_BTN = "#js_preview > button";
+                await page.waitForSelector(PREVIEW_BTN);
+                await page.click(PREVIEW_BTN);
+                await page.waitFor(500);
 
-            // 群发+确认群发
-            console.log("扫码确认群发中...");
-            const SCAN_SEND_BTN = "#send_btn_main > div > a";
-            await page.waitForSelector(SCAN_SEND_BTN);
-            await page.click(SCAN_SEND_BTN);
-            const CONFIRM_SEND_BTN = "#vue_app > div:nth-child(3) > div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__ft > button.weui-desktop-btn.weui-desktop-btn_primary";
-            await page.waitForSelector(CONFIRM_SEND_BTN);
-            await page.waitFor(500);
-            await page.click(CONFIRM_SEND_BTN);
-
-            // 等待确认二维码
-            await page.waitForSelector('body > div.dialog_wrp.ui-draggable > div > div.dialog_bd > div > div > div.qrcode_wrp > img')
-            await page.waitFor(500);
-            await page.screenshot({
-                path: 'confirmSend.png',
-                clip: {
-                    x: 460,
-                    y: 480,
-                    width: 280,
-                    height: 330
+                const element = await page.$('[class="weui-desktop-form-tag__name"]');
+                if (!element) {
+                    // 没有默认预览的名单，则添加 preview_username 中的名单
+                    await page.focus('#js_preview_wxname');
+                    for (const key in preview_username) {
+                        const username = preview_username[key];
+                        await page.keyboard.type(username);
+                        await page.keyboard.press('Enter', {
+                            delay: 100
+                        });
+                        await page.waitFor(1500);
+                    }
                 }
-            });
-            open('confirmSend.png');
 
-            // 等待发布成功页面展示
-            const MAIN_BD = "#app > div.main_bd";
-            await page.waitForSelector(MAIN_BD);
-            await page.waitFor(500);
-            console.log("群发发布成功。");
+                // 预览确认
+                console.log("预览确认中...");
+                const PREVIEW_CONFIRM_BTN = "body > div.dialog_wrp.label_block.wechat_send_dialog.ui-draggable > div > div.dialog_ft > span.btn.btn_primary.btn_input.js_btn_p > button"
+                await page.waitForSelector(PREVIEW_CONFIRM_BTN);
+                await page.click(PREVIEW_CONFIRM_BTN);
+            } else {
+                // 保存并转发
+                console.log("正在保存文章并转发...");
+                const SEND_BTN = "#js_send > button";
+                await page.waitForSelector(SEND_BTN);
+                await page.click(SEND_BTN);
+                await page.waitFor(500);
 
-            // 删除扫码确认发布截图
-            fs.unlinkSync('confirmSend.png');
+                // 群发+确认群发
+                console.log("扫码确认群发中...");
+                const SCAN_SEND_BTN = "#send_btn_main > div > a";
+                await page.waitForSelector(SCAN_SEND_BTN);
+                await page.click(SCAN_SEND_BTN);
+                const CONFIRM_SEND_BTN = "#vue_app > div:nth-child(3) > div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__ft > button.weui-desktop-btn.weui-desktop-btn_primary";
+                await page.waitForSelector(CONFIRM_SEND_BTN);
+                await page.waitFor(500);
+                await page.click(CONFIRM_SEND_BTN);
+
+                // 等待确认二维码
+                await page.waitForSelector('body > div.dialog_wrp.ui-draggable > div > div.dialog_bd > div > div > div.qrcode_wrp > img')
+                await page.waitFor(500);
+                await page.screenshot({
+                    path: 'confirmSend.png',
+                    clip: {
+                        x: 460,
+                        y: 480,
+                        width: 280,
+                        height: 330
+                    }
+                });
+                open('confirmSend.png');
+
+                // 等待发布成功页面展示
+                const MAIN_BD = "#app > div.main_bd";
+                await page.waitForSelector(MAIN_BD);
+                await page.waitFor(500);
+                console.log("群发发布成功。");
+
+                // 删除扫码确认发布截图
+                fs.unlinkSync('confirmSend.png');
+            }
 
             // 结束
             browser.close();
