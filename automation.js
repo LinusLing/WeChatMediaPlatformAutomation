@@ -260,8 +260,8 @@ function autoLogin() {
                 delay: 100
             });
             let pasted_content = content ? content : (await clipboardy.read());
-            // await page.keyboard.type(String(pasted_content));
-            await page.waitFor(5000);
+            await page.keyboard.type(String(pasted_content));
+            await page.waitFor(100);
 
             console.log("----------文章内容 begin----------");
             console.log(pasted_content)
