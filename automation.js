@@ -259,8 +259,21 @@ function autoLogin() {
             await page.keyboard.press('Tab', {
                 delay: 100
             });
-            let pasted_content = content ? content : (await clipboardy.read());
-            await page.keyboard.type(String(pasted_content));
+
+            var pasted_content;
+            if (content) {
+                // 指定文章内容时，模拟键盘输入内容
+                pasted_content = content;
+                await page.keyboard.type(String(pasted_content));
+            } else {
+                // 未指定文章内容时，采用剪贴板粘贴的方式填入内容
+                pasted_content = await clipboardy.read();
+                // https://stackoverflow.com/questions/11750447/performing-a-copy-and-paste-with-selenium-2#answer-41046276
+                // https://github.com/puppeteer/puppeteer/blob/56742ebe8cbb353d7739faee358f60832ef113e5/src/USKeyboardLayout.ts
+                await page.keyboard.down('ShiftLeft')
+                await page.keyboard.press('Insert')
+                await page.keyboard.up('ShiftLeft')
+            }
             await page.waitFor(100);
 
             console.log("----------文章内容 begin----------");
