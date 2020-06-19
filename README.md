@@ -1,17 +1,24 @@
 # WeChatMediaPlatformAutomation
 
-一款在微信公众号( https://mp.weixin.qq.com )自动发布文章的命令行工具。
+一款在微信公众号( https://mp.weixin.qq.com )自动预览/发布文章的命令行工具。
 
 ## 如何使用
 
 1. 安装：`npm install wechat-mp-automation -g `
+
 2. 打开命令行执行：
    1. 配置文件方式：
       1. `wechat-mp-automation -C YOUR_CONFIG_JSON_FILE_PATH`
    2. 非配置文件方式：
       1. 非原创：`wechat-mp-automation -t [标题] -a [作者] -u [账号] -p [密码]`
       2. 声明原创：`wechat-mp-automation -t [标题] -a [作者] -u [账号] -p [密码] -o`
-3. 过程中的两次扫码：一次扫码验证身份登录，一次扫码确认群发（如未异常报错）
+      3. 其余参数，参看如下帮助文档👇
+   
+3. 过程中的扫码：
+
+   1. 一次扫码，验证身份后登录
+   2. 若设置了只预览不发布（1.2.0 起支持 `--preview`），无需扫码即可预览文章
+   3. 1.2.0 前版本或未设置预览的情况，还需一次扫码，确认群发（如群发前，未异常报错的话）
 
 > 本工具不以任何形式保存账号和密码！！！
 
@@ -24,15 +31,19 @@ $ wechat-mp-automation -h
 Usage: wechat-mp-automation [options]
 
 Options:
-  -V, --version         output the version number
-  -C, --configPath [xxx]  配置文件的本地路径（支持所有自定义参数，优先配置文件内的参数）
-  -t, --title [xxx]     文章标题
-  -a, --author [xxx]    文章作者
-  -c, --content [xxx]   文章内容[可选]，默认从粘贴板复制
-  -u, --username [xxx]  公众号账号
-  -p, --password [xxx]  公众号密码
-  -o, --original        声明原创[可选]
-  -h, --help            output usage information
+  -V, --version             output the version number
+  -C, --configPath [xxx]    配置文件的本地路径（支持所有自定义参数）
+  -t, --title [xxx]         文章标题
+  -a, --author [xxx]        文章作者
+  -c, --content [xxx]       文章内容[可选]，默认从粘贴板复制
+  -u, --username [xxx]      公众号账号
+  -p, --password [xxx]      公众号密码
+  -o, --original            声明原创[可选]
+  --preview                 预览而不发布[可选]
+  --preview_username [xxx]  预览名单[可选]
+  --skip_typing             跳过文章标题、作者、文章的填写和封面图片选择（声明原创除外）[可选]
+  --last_edit               选中最近编辑的文章[可选]，请自行确保当前有“最近编辑”的文章
+  -h, --help                output usage information
 ```
 
 config.json demo:
@@ -47,6 +58,16 @@ config.json demo:
 ```
 
 ## CHANGELOG
+
+<details>
+<summary>1.2.0</summary>
+</br>
+<p>1. 支持预览文章，而不发布</p>
+<p>2. 选择预览时，支持指定预览的微信号名单（自行保证微信号已关注公众号）</p>
+<p>3. 支持跳过填写内容，建议用于二次预览或发布的情况</p>
+<p>4. 支持选择最近编辑的文章功能，避免每次都新建群发</p>
+<p>5. 未指定文章内容时，采用剪贴板粘贴的方式填入内容，替换原模拟键盘输入的方式</p>
+</details>
 
 <details>
 <summary>1.1.1</summary>
@@ -64,11 +85,15 @@ config.json demo:
 
 ## Demo
 
-1.自动发布成功的流程示例
+1. 预览最近编辑的文章（用于上一次异常报错或想查看最近一次编辑的文章）
+
+![1.2.0.png](https://i.loli.net/2020/06/19/FzryZdN5VsXoplw.png)
+
+2. 自动发布成功的流程示例
 
 ![CorrectResult.png](https://i.loli.net/2019/07/23/5d371a7398b4141770.png)
 
-2.发布失败流程及失败原因
+2. 发布失败流程及失败原因
 
 ![error_progress.png](https://i.loli.net/2019/07/23/5d371a73c0f5f58172.png)
 
@@ -77,7 +102,7 @@ config.json demo:
 ## TODO
 
 1. 通过指定特定文件来上传文章内容
-2. 文章发布前的设置可进行自定义（比如预览、图片选择等）
+2. 文章发布前的设置可进行自定义（比如~~预览~~、图片选择等）
 
 ## Issues
 

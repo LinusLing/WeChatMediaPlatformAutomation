@@ -8,7 +8,7 @@ var fs = require('fs');
 const program = require('commander');
 
 program
-    .version('1.1.1')
+    .version('1.2.0')
     .usage(' [options]')
     .option('-C, --configPath [xxx]', '配置文件的本地路径（支持所有自定义参数）')
     .option('-t, --title [xxx]', '文章标题')
@@ -18,7 +18,7 @@ program
     .option('-p, --password [xxx]', '公众号密码')
     .option('-o, --original', '声明原创[可选]')
     .option('--preview', '预览而不发布[可选]')
-    .option('--preview_username [xxx]', '预览名单[可选]')
+    .option('--preview_username [xxx]', '预览名单[可选]，以~间隔多个微信号（自行保证微信号已关注公众号）')
     .option('--skip_typing', '跳过文章标题、作者、文章的填写和封面图片选择（声明原创除外）[可选]')
     .option('--last_edit', '选中最近编辑的文章[可选]，请自行确保当前有“最近编辑”的文章')
     .parse(process.argv);
@@ -44,6 +44,10 @@ if (program.configPath !== undefined) {
         username = jsonContent.username || undefined;
         password = jsonContent.password || undefined;
         original = jsonContent.original || undefined;
+        preview = jsonContent.preview || undefined;
+        preview_username = program.preview_username.split("~") || undefined;
+        skip_typing = jsonContent.skip_typing || undefined;
+        last_edit = jsonContent.last_edit || undefined;
         console.log('读取配置文件成功');
     } catch (error) {
         console.log('读取配置文件失败');
@@ -99,6 +103,7 @@ if (original === undefined) {
     }
 }
 console.log((!original ? "文章不" : "文章将") + "声明原创");
+
 if (preview === undefined) {
     if (program.preview === undefined) {} else {
         preview = program.preview;
@@ -207,6 +212,8 @@ function autoLogin() {
 
                 // 删除扫码登录截图
                 fs.unlinkSync('screenshot.png');
+
+                await page.waitFor(5000);
             } else {
                 // 新建群发
                 console.log("新建群发文章中...");
@@ -320,8 +327,9 @@ function autoLogin() {
                 // 封面图片选择
                 console.log("正在自动选择封面图片...");
                 await page.hover('#js_cover_area > div.select-cover__btn.js_cover_btn_area');
+                await page.waitFor(500);
                 await page.click('#js_imagedialog');
-                await page.waitForSelector('div.weui-desktop-dialog__wrp.weui-desktop-dialog_img-picker.weui-desktop-dialog_img-picker-with-crop > div > div.weui-desktop-dialog__bd > div > div > div:nth-child(2) > div > div.weui-desktop-media-list-wrp.weui-desktop-img-picker__list__wrp.js_img-picker_wrapper > ul > li:nth-child(1)');
+                await page.waitForSelector('div > div.weui-desktop-media-list-wrp.weui-desktop-img-picker__list__wrp.js_img-picker_wrapper > ul > li:nth-child(1)');
 
                 let day = (new LocalDate()).getDay();
                 const len = await page.$$eval('.weui-desktop-img-picker__list > li.weui-desktop-img-picker__item > i', links => {
@@ -340,13 +348,16 @@ function autoLogin() {
                 await page.waitForSelector(IMG_DONE);
                 await page.waitFor(200);
                 await page.click(IMG_DONE);
-                await page.waitFor(1000);
+                await page.waitFor(2000);
             }
 
-            if (original === true) {
+            if (original) {
                 // 声明原创
                 console.log("正在声明原创...");
-                await page.click('#js_original > div.unorigin.js_original_type > div.setting-group__content > a');
+
+                await page.evaluate(() => {
+                    document.querySelector('#js_original > div.unorigin.js_original_type > div.setting-group__content > a').click();
+                });
                 await page.waitForSelector("label[for='js_copyright_agree'");
                 await page.click('body > div.dialog_wrp.simple.align_edge.original_dialog.ui-draggable > div > div.dialog_bd > div.step_panel.step_agreement.js_step_panel > div > div > div > div.tool_area.new-tool_area > label > i');
                 await page.click('body > div.dialog_wrp.simple.align_edge.original_dialog.ui-draggable > div > div.dialog_ft > span:nth-child(1) > button');
@@ -361,7 +372,7 @@ function autoLogin() {
                 await page.waitFor(500);
             }
 
-            if (preview === true) {
+            if (preview) {
                 // 预览
                 console.log("正在预览文章...");
                 const PREVIEW_BTN = "#js_preview > button";
@@ -371,6 +382,7 @@ function autoLogin() {
 
                 const element = await page.$('[class="weui-desktop-form-tag__name"]');
                 if (!element) {
+                    console.log("正在填写预览名单...");
                     // 没有默认预览的名单，则添加 preview_username 中的名单
                     await page.waitForSelector('#js_preview_wxname');
                     await page.focus('#js_preview_wxname');
