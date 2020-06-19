@@ -334,6 +334,7 @@ function autoLogin() {
                 const element = await page.$('[class="weui-desktop-form-tag__name"]');
                 if (!element) {
                     // 没有默认预览的名单，则添加 preview_username 中的名单
+                    await page.waitForSelector('#js_preview_wxname');
                     await page.focus('#js_preview_wxname');
                     for (const key in preview_username) {
                         const username = preview_username[key];
