@@ -25,7 +25,7 @@
     "commander": "^2.20.0",
     "js-localdate-plus": "^1.0.1",
     "open": "^6.4.0",
-    "puppeteer": "^1.18.1"
+    "puppeteer": "^4.0.0"
   },
   "bugs": {
     "url": "https://github.com/LinusLing/WeChatMediaPlatformAutomation/issues"
