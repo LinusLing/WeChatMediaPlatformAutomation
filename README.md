@@ -85,7 +85,11 @@ config.json demo:
 
 ## Demo
 
-1. 预览最近编辑的文章（用于上一次异常报错或想查看最近一次编辑的文章）
+1. 利用**文章内容默认从粘贴板复制**的特性，配合一行命令生成公众号内容的工具 [wechat-format-cli](https://github.com/LinusLing/wechat-format-cli) 使用更香
+
+![cli.png](https://i.loli.net/2020/06/19/GDEwdxrHnTVRyZe.png)
+
+2. 预览最近编辑的文章（用于上一次异常报错或想查看最近一次编辑的文章）
 
 ![1.2.0.png](https://i.loli.net/2020/06/19/FzryZdN5VsXoplw.png)
 
