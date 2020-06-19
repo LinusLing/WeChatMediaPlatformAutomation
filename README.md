@@ -31,19 +31,19 @@ $ wechat-mp-automation -h
 Usage: wechat-mp-automation [options]
 
 Options:
-  -V, --version             output the version number
-  -C, --configPath [xxx]    配置文件的本地路径（支持所有自定义参数）
-  -t, --title [xxx]         文章标题
-  -a, --author [xxx]        文章作者
-  -c, --content [xxx]       文章内容[可选]，默认从粘贴板复制
-  -u, --username [xxx]      公众号账号
-  -p, --password [xxx]      公众号密码
-  -o, --original            声明原创[可选]
-  --preview                 预览而不发布[可选]
-  --preview_username [xxx]  预览名单[可选]
-  --skip_typing             跳过文章标题、作者、文章的填写和封面图片选择（声明原创除外）[可选]
-  --last_edit               选中最近编辑的文章[可选]，请自行确保当前有“最近编辑”的文章
-  -h, --help                output usage information
+  -V, --version                 output the version number
+  -C, --configPath [xxx]        配置文件的本地路径（支持所有自定义参数）
+  -t, --title [xxx]             文章标题
+  -a, --author [xxx]            文章作者
+  -c, --content [xxx]           文章内容[可选]，默认从粘贴板复制
+  -u, --username [xxx]          公众号账号
+  -p, --password [xxx]          公众号密码
+  -o, --original                声明原创[可选]
+  --preview                     预览而不发布[可选]
+  --preview_username [xxx~yyy]  预览名单[可选]，以~间隔多个微信号（自行保证微信号已关注公众号）
+  --skip_typing                 跳过文章标题、作者、文章的填写和封面图片选择（声明原创除外）[可选]
+  --last_edit                   选中最近编辑的文章[可选]，请自行确保当前有“最近编辑”的文章
+  -h, --help                    output usage information
 ```
 
 config.json demo:

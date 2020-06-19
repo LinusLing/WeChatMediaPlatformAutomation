@@ -18,7 +18,7 @@ program
     .option('-p, --password [xxx]', '公众号密码')
     .option('-o, --original', '声明原创[可选]')
     .option('--preview', '预览而不发布[可选]')
-    .option('--preview_username [xxx]', '预览名单[可选]，以~间隔多个微信号（自行保证微信号已关注公众号）')
+    .option('--preview_username [xxx~yyy]', '预览名单[可选]，以~间隔多个微信号（自行保证微信号已关注公众号）')
     .option('--skip_typing', '跳过文章标题、作者、文章的填写和封面图片选择（声明原创除外）[可选]')
     .option('--last_edit', '选中最近编辑的文章[可选]，请自行确保当前有“最近编辑”的文章')
     .parse(process.argv);
