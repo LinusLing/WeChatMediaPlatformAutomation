@@ -16,9 +16,11 @@ program
     .option('-c, --content [xxx]', '文章内容[可选]，默认从粘贴板复制')
     .option('-u, --username [xxx]', '公众号账号')
     .option('-p, --password [xxx]', '公众号密码')
+    .option('-o, --original', '声明原创[可选]')
     .option('--preview', '预览而不发布[可选]')
     .option('--preview_username [xxx]', '预览名单[可选]')
-    .option('-o, --original', '声明原创[可选]')
+    .option('--skip_typing', '跳过文章标题、作者、文章的填写和封面图片选择（声明原创除外）[可选]')
+    .option('--last_edit', '选中最近编辑的文章[可选]，请自行确保当前有“最近编辑”的文章')
     .parse(process.argv);
 
 let title;
@@ -29,6 +31,8 @@ let password;
 let original;
 let preview;
 let preview_username;
+let skip_typing;
+let last_edit;
 
 if (program.configPath !== undefined) {
     try {
@@ -46,6 +50,8 @@ if (program.configPath !== undefined) {
         console.log(error);
     }
 }
+
+console.log("----------配置内容 begin----------");
 
 if (title === undefined) {
     if (program.title === undefined) {
@@ -106,6 +112,22 @@ if (preview_username === undefined) {
         console.log("可预览本文章的微信号：" + preview_username + "（关注公众号后，才能接收图文消息预览）");
     }
 }
+
+if (skip_typing === undefined) {
+    if (program.skip_typing === undefined) {} else {
+        skip_typing = program.skip_typing;
+        console.log("将跳过文章标题、作者、文章的填写和封面图片选择（声明原创除外）");
+    }
+}
+
+if (last_edit === undefined) {
+    if (program.last_edit === undefined) {} else {
+        last_edit = program.last_edit;
+    }
+}
+console.log(last_edit ? "将选中最近编辑的文章" : "将新建群发的文章");
+
+console.log("----------配置内容 end----------");
 
 const url = "https://mp.weixin.qq.com/"
 
@@ -173,137 +195,153 @@ function autoLogin() {
             });
             open('screenshot.png');
 
-            // 新建群发
-            console.log("新建群发文章中...");
-            const NEW_POST_WITH_DRAFT = '#app > div.main_bd > div:nth-child(3) > div.weui-desktop-panel__hd.weui-desktop-global-mod > div.weui-desktop-global__extra > a'
-            const NEW_POST = '#app > div.main_bd > div:nth-child(3) > div > div > a'
-            const NEW_POST_CLASS_NAME = 'weui-desktop-btn weui-desktop-btn_primary'
-            const element2 = await Promise.race([
-                page.waitForSelector(NEW_POST),
-                page.waitForSelector(NEW_POST_WITH_DRAFT)
-            ]);
-            var props = await page.evaluate(
-                element => Array.from(element.attributes, ({
-                    name,
-                    value
-                }) => name === 'class' ? `${value}` : null),
-                element2
-            );
-            const realClassName = props.find(value => value !== null);
-            let REAL_SELECTOR;
-            if (realClassName === NEW_POST_CLASS_NAME) {
-                REAL_SELECTOR = NEW_POST;
+            if (last_edit) {
+                // 最近编辑
+                console.log("打开最近编辑的文章中...");
+                const LAST_EDIT_BUTTON_SELECTOR = '#app > div.main_bd > div:nth-child(3) > div.weui-desktop-panel__bd > div > span > a:nth-child(1)';
+                await Promise.race([
+                    page.waitForSelector(LAST_EDIT_BUTTON_SELECTOR)
+                ]);
+                await page.waitFor(500);
+                page = await clickAndWaitForTarget(LAST_EDIT_BUTTON_SELECTOR, page, browser);
+
+                // 删除扫码登录截图
+                fs.unlinkSync('screenshot.png');
             } else {
-                REAL_SELECTOR = NEW_POST_WITH_DRAFT;
-            }
-            await page.waitFor(500);
-            page = await clickAndWaitForTarget(REAL_SELECTOR, page, browser);
-            await page.setViewport({
-                width: 1200,
-                height: 890,
-            });
-            await page.waitForSelector("body");
-            await page.waitFor(5000);
-
-            // 删除扫码登录截图
-            fs.unlinkSync('screenshot.png');
-
-            await page.evaluate(() => {
-                window.click = function click(x, y) {
-                    var ev = document.createEvent("MouseEvent");
-                    var el = document.elementFromPoint(x, y);
-                    ev.initMouseEvent(
-                        "click",
-                        true /* bubble */ , true /* cancelable */ ,
-                        window, null,
-                        x, y, 0, 0, /* coordinates */
-                        false, false, false, false, /* modifier keys */
-                        0 /*left*/ , null
-                    );
-                    el.dispatchEvent(ev);
+                // 新建群发
+                console.log("新建群发文章中...");
+                const NEW_POST_WITH_DRAFT = '#app > div.main_bd > div:nth-child(3) > div.weui-desktop-panel__hd.weui-desktop-global-mod > div.weui-desktop-global__extra > a'
+                const NEW_POST = '#app > div.main_bd > div:nth-child(3) > div > div > a'
+                const NEW_POST_CLASS_NAME = 'weui-desktop-btn weui-desktop-btn_primary'
+                const element2 = await Promise.race([
+                    page.waitForSelector(NEW_POST),
+                    page.waitForSelector(NEW_POST_WITH_DRAFT)
+                ]);
+                var props = await page.evaluate(
+                    element => Array.from(element.attributes, ({
+                        name,
+                        value
+                    }) => name === 'class' ? `${value}` : null),
+                    element2
+                );
+                const realClassName = props.find(value => value !== null);
+                let REAL_SELECTOR;
+                if (realClassName === NEW_POST_CLASS_NAME) {
+                    REAL_SELECTOR = NEW_POST;
+                } else {
+                    REAL_SELECTOR = NEW_POST_WITH_DRAFT;
                 }
-            });
-            await page.evaluate(() => {
-                const click = window.click;
-                click(600, 470);
-            });
+                await page.waitFor(500);
+                page = await clickAndWaitForTarget(REAL_SELECTOR, page, browser);
+                await page.setViewport({
+                    width: 1200,
+                    height: 890,
+                });
+                await page.waitForSelector("body");
+                await page.waitFor(5000);
 
-            const pageTarget = page.target(); //save this to know that this was the opener
-            // await page.click(clickSelector); //click on a link
-            const newTarget = await browser.waitForTarget(target => target.opener() === pageTarget); //check that you opened this page, rather than just checking the url
-            page = await newTarget.page(); //get the page object
-            await page.setViewport({
-                width: 1200,
-                height: 890,
-            });
-            await page.waitForSelector("body");
-            await page.waitFor(5000);
+                // 删除扫码登录截图
+                fs.unlinkSync('screenshot.png');
 
-            // 文章标题
-            console.log("正在填写文章标题...");
-            await page.click('#title');
-            await page.waitFor(100);
-            await page.keyboard.type(String(title));
-            await page.waitFor(100);
+                await page.evaluate(() => {
+                    window.click = function click(x, y) {
+                        var ev = document.createEvent("MouseEvent");
+                        var el = document.elementFromPoint(x, y);
+                        ev.initMouseEvent(
+                            "click",
+                            true /* bubble */ , true /* cancelable */ ,
+                            window, null,
+                            x, y, 0, 0, /* coordinates */
+                            false, false, false, false, /* modifier keys */
+                            0 /*left*/ , null
+                        );
+                        el.dispatchEvent(ev);
+                    }
+                });
+                await page.evaluate(() => {
+                    const click = window.click;
+                    click(600, 470);
+                });
 
-            // 文章作者
-            console.log("正在填写文章作者...");
-            await page.keyboard.press('Tab', {
-                delay: 100
-            });
-            await page.keyboard.type(String(author));
-            await page.waitFor(100);
-
-            // 文章内容
-            console.log("正在填写文章内容...");
-            await page.keyboard.press('Tab', {
-                delay: 100
-            });
-
-            var pasted_content;
-            if (content) {
-                // 指定文章内容时，模拟键盘输入内容
-                pasted_content = content;
-                await page.keyboard.type(String(pasted_content));
-            } else {
-                // 未指定文章内容时，采用剪贴板粘贴的方式填入内容
-                pasted_content = await clipboardy.read();
-                // https://stackoverflow.com/questions/11750447/performing-a-copy-and-paste-with-selenium-2#answer-41046276
-                // https://github.com/puppeteer/puppeteer/blob/56742ebe8cbb353d7739faee358f60832ef113e5/src/USKeyboardLayout.ts
-                await page.keyboard.down('ShiftLeft')
-                await page.keyboard.press('Insert')
-                await page.keyboard.up('ShiftLeft')
+                const pageTarget = page.target(); //save this to know that this was the opener
+                // await page.click(clickSelector); //click on a link
+                const newTarget = await browser.waitForTarget(target => target.opener() === pageTarget); //check that you opened this page, rather than just checking the url
+                page = await newTarget.page(); //get the page object
+                await page.setViewport({
+                    width: 1200,
+                    height: 890,
+                });
+                await page.waitForSelector("body");
+                await page.waitFor(5000);
             }
-            await page.waitFor(100);
 
-            console.log("----------文章内容 begin----------");
-            console.log(pasted_content)
-            console.log("----------文章内容 end----------");
+            if (!skip_typing) {
+                // 文章标题
+                console.log("正在填写文章标题...");
+                await page.click('#title');
+                await page.waitFor(100);
+                await page.keyboard.type(String(title));
+                await page.waitFor(100);
 
-            // 封面图片选择
-            console.log("正在自动选择封面图片...");
-            await page.hover('#js_cover_area > div.select-cover__btn.js_cover_btn_area');
-            await page.click('#js_imagedialog');
-            await page.waitForSelector('div.weui-desktop-dialog__wrp.weui-desktop-dialog_img-picker.weui-desktop-dialog_img-picker-with-crop > div > div.weui-desktop-dialog__bd > div > div > div:nth-child(2) > div > div.weui-desktop-media-list-wrp.weui-desktop-img-picker__list__wrp.js_img-picker_wrapper > ul > li:nth-child(1)');
+                // 文章作者
+                console.log("正在填写文章作者...");
+                await page.keyboard.press('Tab', {
+                    delay: 100
+                });
+                await page.keyboard.type(String(author));
+                await page.waitFor(100);
 
-            let day = (new LocalDate()).getDay();
-            const len = await page.$$eval('.weui-desktop-img-picker__list > li.weui-desktop-img-picker__item > i', links => {
-                return links.length
-            });
-            let offset = day % len + 1;
-            const left = 'div > div.weui-desktop-media-list-wrp.weui-desktop-img-picker__list__wrp.js_img-picker_wrapper > ul > li:nth-child(';
-            const right = ')';
-            await page.click(left + String(offset) + right);
+                // 文章内容
+                console.log("正在填写文章内容...");
+                await page.keyboard.press('Tab', {
+                    delay: 100
+                });
 
-            await page.click('div.weui-desktop-dialog__wrp.weui-desktop-dialog_img-picker.weui-desktop-dialog_img-picker-with-crop > div > div.weui-desktop-dialog__ft > button');
-            await page.waitFor(1200);
+                var pasted_content;
+                if (content) {
+                    // 指定文章内容时，模拟键盘输入内容
+                    pasted_content = content;
+                    await page.keyboard.type(String(pasted_content));
+                } else {
+                    // 未指定文章内容时，采用剪贴板粘贴的方式填入内容
+                    pasted_content = await clipboardy.read();
+                    // https://stackoverflow.com/questions/11750447/performing-a-copy-and-paste-with-selenium-2#answer-41046276
+                    // https://github.com/puppeteer/puppeteer/blob/56742ebe8cbb353d7739faee358f60832ef113e5/src/USKeyboardLayout.ts
+                    await page.keyboard.down('ShiftLeft')
+                    await page.keyboard.press('Insert')
+                    await page.keyboard.up('ShiftLeft')
+                }
+                await page.waitFor(100);
 
-            // 选择图片完成
-            const IMG_DONE = "div.weui-desktop-dialog__wrp.weui-desktop-dialog_img-picker.weui-desktop-dialog_img-picker-with-crop > div > div.weui-desktop-dialog__ft > button:nth-child(3)";
-            await page.waitForSelector(IMG_DONE);
-            await page.waitFor(200);
-            await page.click(IMG_DONE);
-            await page.waitFor(1000);
+                console.log("----------文章内容 begin----------");
+                console.log(pasted_content)
+                console.log("----------文章内容 end----------");
+
+                // 封面图片选择
+                console.log("正在自动选择封面图片...");
+                await page.hover('#js_cover_area > div.select-cover__btn.js_cover_btn_area');
+                await page.click('#js_imagedialog');
+                await page.waitForSelector('div.weui-desktop-dialog__wrp.weui-desktop-dialog_img-picker.weui-desktop-dialog_img-picker-with-crop > div > div.weui-desktop-dialog__bd > div > div > div:nth-child(2) > div > div.weui-desktop-media-list-wrp.weui-desktop-img-picker__list__wrp.js_img-picker_wrapper > ul > li:nth-child(1)');
+
+                let day = (new LocalDate()).getDay();
+                const len = await page.$$eval('.weui-desktop-img-picker__list > li.weui-desktop-img-picker__item > i', links => {
+                    return links.length
+                });
+                let offset = day % len + 1;
+                const left = 'div > div.weui-desktop-media-list-wrp.weui-desktop-img-picker__list__wrp.js_img-picker_wrapper > ul > li:nth-child(';
+                const right = ')';
+                await page.click(left + String(offset) + right);
+
+                await page.click('div.weui-desktop-dialog__wrp.weui-desktop-dialog_img-picker.weui-desktop-dialog_img-picker-with-crop > div > div.weui-desktop-dialog__ft > button');
+                await page.waitFor(1200);
+
+                // 选择图片完成
+                const IMG_DONE = "div.weui-desktop-dialog__wrp.weui-desktop-dialog_img-picker.weui-desktop-dialog_img-picker-with-crop > div > div.weui-desktop-dialog__ft > button:nth-child(3)";
+                await page.waitForSelector(IMG_DONE);
+                await page.waitFor(200);
+                await page.click(IMG_DONE);
+                await page.waitFor(1000);
+            }
 
             if (original === true) {
                 // 声明原创
@@ -351,6 +389,9 @@ function autoLogin() {
                 const PREVIEW_CONFIRM_BTN = "body > div.dialog_wrp.label_block.wechat_send_dialog.ui-draggable > div > div.dialog_ft > span.btn.btn_primary.btn_input.js_btn_p > button"
                 await page.waitForSelector(PREVIEW_CONFIRM_BTN);
                 await page.click(PREVIEW_CONFIRM_BTN);
+
+                await page.waitFor(500);
+                console.log("预览发布成功。");
             } else {
                 // 保存并转发
                 console.log("正在保存文章并转发...");
@@ -408,4 +449,4 @@ function autoLogin() {
         }
     })
 }
-autoLogin().then(console.log).catch(console.error);
+autoLogin().catch(console.error);
