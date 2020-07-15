@@ -207,6 +207,8 @@ function autoLogin() {
                 await Promise.race([
                     page.waitForSelector(LAST_EDIT_BUTTON_SELECTOR)
                 ]);
+
+                await page.hover(LAST_EDIT_BUTTON_SELECTOR);
                 await page.waitFor(500);
                 page = await clickAndWaitForTarget(LAST_EDIT_BUTTON_SELECTOR, page, browser);
 
