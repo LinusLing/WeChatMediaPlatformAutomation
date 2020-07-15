@@ -60,6 +60,12 @@ config.json demo:
 ## CHANGELOG
 
 <details>
+<summary>1.3.0</summary>
+</br>
+<p>1. 支持新版本的公众号后台</p>
+</details>
+
+<details>
 <summary>1.2.0</summary>
 </br>
 <p>1. 支持预览文章，而不发布</p>
@@ -107,6 +113,7 @@ config.json demo:
 
 1. 通过指定特定文件来上传文章内容
 2. 文章发布前的设置可进行自定义（比如~~预览~~、图片选择等）
+3. 支持更多种类的创作（~~图文消息~~、文字消息、视频消息、音频消息、图片消息、转载等）
 
 ## Issues
 
@@ -114,5 +121,5 @@ config.json demo:
 
 ## 赞赏
 
-<div style="float:left;border:solid 1px 000;margin:2px;"><img src="https://i.loli.net/2019/07/23/5d370dca1cf1911283.jpg"  width="300" height="450" ></div>
+<div style="float:left;border:solid 1px 000;margin:2px;"><img src="https://i.loli.net/2019/07/23/5d370dca1cf1911283.jpg" width="300" height="450" ></div>
 <div style="float:left;border:solid 1px 000;margin:2px;"><img src="https://i.loli.net/2019/07/23/5d370dcd23ed242202.jpg" width="300" height="450" ></div>

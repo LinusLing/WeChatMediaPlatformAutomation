@@ -8,7 +8,7 @@ var fs = require('fs');
 const program = require('commander');
 
 program
-    .version('1.2.0')
+    .version('1.3.0')
     .usage(' [options]')
     .option('-C, --configPath [xxx]', '配置文件的本地路径（支持所有自定义参数）')
     .option('-t, --title [xxx]', '文章标题')
@@ -203,7 +203,7 @@ function autoLogin() {
             if (last_edit) {
                 // 最近编辑
                 console.log("打开最近编辑的文章中...");
-                const LAST_EDIT_BUTTON_SELECTOR = '#app > div.main_bd > div:nth-child(3) > div.weui-desktop-panel__bd > div > span > a:nth-child(1)';
+                const LAST_EDIT_BUTTON_SELECTOR = '#app > div.main_bd > div:nth-child(5) > div.weui-desktop-panel__bd > div > div > div:nth-child(1) > span:nth-child(1) > div > div > div.weui-desktop-card__action > div > div.weui-desktop-tooltip__wrp.weui-desktop-link';
                 await Promise.race([
                     page.waitForSelector(LAST_EDIT_BUTTON_SELECTOR)
                 ]);
@@ -215,70 +215,19 @@ function autoLogin() {
 
                 await page.waitFor(5000);
             } else {
-                // 新建群发
+                // 新建群发（图文消息 div:nth-child(1)）
                 console.log("新建群发文章中...");
-                const NEW_POST_WITH_DRAFT = '#app > div.main_bd > div:nth-child(3) > div.weui-desktop-panel__hd.weui-desktop-global-mod > div.weui-desktop-global__extra > a'
-                const NEW_POST = '#app > div.main_bd > div:nth-child(3) > div > div > a'
-                const NEW_POST_CLASS_NAME = 'weui-desktop-btn weui-desktop-btn_primary'
+                const NEW_POST = '#app > div.main_bd > div:nth-child(3) > div.weui-desktop-panel__bd > div > div:nth-child(1)'
                 const element2 = await Promise.race([
-                    page.waitForSelector(NEW_POST),
-                    page.waitForSelector(NEW_POST_WITH_DRAFT)
+                    page.waitForSelector(NEW_POST)
                 ]);
-                var props = await page.evaluate(
-                    element => Array.from(element.attributes, ({
-                        name,
-                        value
-                    }) => name === 'class' ? `${value}` : null),
-                    element2
-                );
-                const realClassName = props.find(value => value !== null);
-                let REAL_SELECTOR;
-                if (realClassName === NEW_POST_CLASS_NAME) {
-                    REAL_SELECTOR = NEW_POST;
-                } else {
-                    REAL_SELECTOR = NEW_POST_WITH_DRAFT;
-                }
+
                 await page.waitFor(500);
-                page = await clickAndWaitForTarget(REAL_SELECTOR, page, browser);
-                await page.setViewport({
-                    width: 1200,
-                    height: 890,
-                });
-                await page.waitForSelector("body");
-                await page.waitFor(5000);
+                page = await clickAndWaitForTarget(NEW_POST, page, browser);
 
                 // 删除扫码登录截图
                 fs.unlinkSync('screenshot.png');
 
-                await page.evaluate(() => {
-                    window.click = function click(x, y) {
-                        var ev = document.createEvent("MouseEvent");
-                        var el = document.elementFromPoint(x, y);
-                        ev.initMouseEvent(
-                            "click",
-                            true /* bubble */ , true /* cancelable */ ,
-                            window, null,
-                            x, y, 0, 0, /* coordinates */
-                            false, false, false, false, /* modifier keys */
-                            0 /*left*/ , null
-                        );
-                        el.dispatchEvent(ev);
-                    }
-                });
-                await page.evaluate(() => {
-                    const click = window.click;
-                    click(600, 470);
-                });
-
-                const pageTarget = page.target(); //save this to know that this was the opener
-                // await page.click(clickSelector); //click on a link
-                const newTarget = await browser.waitForTarget(target => target.opener() === pageTarget); //check that you opened this page, rather than just checking the url
-                page = await newTarget.page(); //get the page object
-                await page.setViewport({
-                    width: 1200,
-                    height: 890,
-                });
-                await page.waitForSelector("body");
                 await page.waitFor(5000);
             }
 
