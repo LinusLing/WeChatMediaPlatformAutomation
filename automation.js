@@ -280,6 +280,8 @@ function autoLogin() {
                 await page.hover('#js_cover_area > div.select-cover__btn.js_cover_btn_area');
                 await page.waitFor(500);
                 await page.click('#js_imagedialog');
+                await page.waitFor(500);
+                await page.click('#js_imagedialog');
                 await page.waitForSelector('div > div.weui-desktop-media-list-wrp.weui-desktop-img-picker__list__wrp.js_img-picker_wrapper > ul > li:nth-child(1)');
 
                 let day = (new LocalDate()).getDay();
