@@ -60,6 +60,12 @@ config.json demo:
 ## CHANGELOG
 
 <details>
+<summary>1.3.1</summary>
+</br>
+<p>1. 修复点击封面图片选择失效的问题</p>
+</details>
+
+<details>
 <summary>1.3.0</summary>
 </br>
 <p>1. 支持新版本的公众号后台</p>
