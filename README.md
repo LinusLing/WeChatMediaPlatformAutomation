@@ -22,7 +22,7 @@
 
 > 本工具不以任何形式保存账号和密码！！！
 
-> puppeteer 安装失败可以参考[这里](https://github.com/cnpm/cnpmjs.org/issues/1246#issuecomment-359148058)
+> puppeteer 安装失败可以参考[这里](https://github.com/cnpm/cnpmjs.org/issues/1246#issuecomment-454268958)
 
 ## 帮助文档
 
