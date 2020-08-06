@@ -60,6 +60,13 @@ config.json demo:
 ## CHANGELOG
 
 <details>
+<summary>1.3.2</summary>
+</br>
+<p>1. 适配新版本的群发界面</p>
+<p>2. 优化二维码的截取展示</p>
+</details>
+
+<details>
 <summary>1.3.1</summary>
 </br>
 <p>1. 修复点击封面图片选择失效的问题</p>
