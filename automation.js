@@ -45,7 +45,7 @@ if (program.configPath !== undefined) {
         password = jsonContent.password || undefined;
         original = jsonContent.original || undefined;
         preview = jsonContent.preview || undefined;
-        preview_username = program.preview_username.split("~") || undefined;
+        preview_username = program.preview_username && program.preview_username.split("~") || undefined;
         skip_typing = jsonContent.skip_typing || undefined;
         last_edit = jsonContent.last_edit || undefined;
         console.log('读取配置文件成功');
@@ -195,7 +195,7 @@ function autoLogin() {
                     x: 390,
                     y: 270,
                     width: 420,
-                    height: 330
+                    height: 350
                 }
             });
             open('screenshot.png');
@@ -367,12 +367,12 @@ function autoLogin() {
 
                 // 群发+确认群发
                 console.log("扫码确认群发中...");
-                const SCAN_SEND_BTN = "#send_btn_main > div > a";
+                const SCAN_SEND_BTN = "div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__ft > div > div.weui-desktop-popover__wrp > button";
                 await page.waitForSelector(SCAN_SEND_BTN);
                 await page.click(SCAN_SEND_BTN);
-                const CONFIRM_SEND_BTN = "#vue_app > div:nth-child(3) > div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__ft > button.weui-desktop-btn.weui-desktop-btn_primary";
+                const CONFIRM_SEND_BTN = "div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__ft > div > button.weui-desktop-btn.weui-desktop-btn_primary";
                 await page.waitForSelector(CONFIRM_SEND_BTN);
-                await page.waitFor(500);
+                await page.waitFor(1000);
                 await page.click(CONFIRM_SEND_BTN);
 
                 // 等待确认二维码
@@ -381,8 +381,8 @@ function autoLogin() {
                 await page.screenshot({
                     path: 'confirmSend.png',
                     clip: {
-                        x: 460,
-                        y: 480,
+                        x: 260,
+                        y: 640,
                         width: 280,
                         height: 330
                     }
