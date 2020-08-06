@@ -64,6 +64,7 @@ config.json demo:
 </br>
 <p>1. 适配新版本的群发界面</p>
 <p>2. 优化二维码的截取展示</p>
+<p>3. 优化参数读取</p>
 </details>
 
 <details>

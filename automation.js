@@ -372,7 +372,7 @@ function autoLogin() {
                 await page.click(SCAN_SEND_BTN);
                 const CONFIRM_SEND_BTN = "div.weui-desktop-dialog__wrp > div > div.weui-desktop-dialog__ft > div > button.weui-desktop-btn.weui-desktop-btn_primary";
                 await page.waitForSelector(CONFIRM_SEND_BTN);
-                await page.waitFor(1000);
+                await page.waitFor(2000);
                 await page.click(CONFIRM_SEND_BTN);
 
                 // 等待确认二维码
