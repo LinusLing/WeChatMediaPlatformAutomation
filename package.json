@@ -21,7 +21,7 @@
   "author": "Linus Ling",
   "license": "MIT",
   "dependencies": {
-    "clipboardy": "^2.1.0",
+    "clipboardy": "^3.0.0",
     "commander": "^2.20.0",
     "js-localdate-plus": "^1.0.1",
     "open": "^6.4.0",
